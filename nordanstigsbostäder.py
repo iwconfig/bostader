@@ -1,9 +1,7 @@
 import requests, lxml.html
-from lxml import etree
 import pandas as pd
 
 data = {}
-pages = []
 url = 'http://marknad.nordanstigsbostader.se/HSS/Object/object_list.aspx?objectgroup=1'
 
 def gather_results(rows):
@@ -31,8 +29,8 @@ s.headers.update({
 response = s.get(url)
 
 tree = lxml.html.fromstring(response.content)
+table = tree.cssselect('table.gridlist')[0]
 
-table = etree.HTML(response.text).cssselect('table.gridlist')[0]
 rows = iter(table)
 headers = [''.join(col.itertext()).strip() for col in next(rows).cssselect('td.header')][1:]
 results = [res for res in gather_results(rows)]
@@ -40,25 +38,30 @@ results = [res for res in gather_results(rows)]
 for d in tree.cssselect('.aspNetHidden > input'):
   data[d.name] = d.value
 
-for p in tree.cssselect('div.navbar > div.text > span.right > a:not(.selected)'):
-  pages.append(p.get('id').replace('_', '$'))
+num_of_pages = int(tree.cssselect('#ctl00_ctl01_DefaultSiteContentPlaceHolder1_Col1_ucNavBar_lblNoOfPages')[0].text)
 
-for page in pages:
-
+# we start at 2 because page 1 is already collected
+for N in range(2, num_of_pages+1):
   data.update({
-    '__EVENTTARGET': page
+    '__EVENTTARGET': 'ctl00$ctl01$DefaultSiteContentPlaceHolder1$Col1$ucNavBar$btnNavNext'
   })
-  
-  response = requests.post(
+
+  response = s.post(
     url,
     data=data
   )
 
-  table = etree.HTML(response.text).cssselect('table.gridlist')[0]
+  tree = lxml.html.fromstring(response.content)
+  table = tree.cssselect('table.gridlist')[0]
   rows = iter(table)
   next(rows)
 
   results.extend([res for res in gather_results(rows)])
+
+  if N < num_of_pages:
+    for d in tree.cssselect('.aspNetHidden > input'):
+      data[d.name] = d.value
+
 
 df = pd.DataFrame(results)
 df.index += 1
