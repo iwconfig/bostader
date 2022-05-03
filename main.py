@@ -11,7 +11,14 @@ def load(_):
     traceback.print_exc()
     abort(500, description='error error! something is wrong')
 
+def make_a_element(text, href=None):
+  if text and href:
+    return f'<a target="_blank" href="{href}">{text}</a>'
+  return text
+
 app = Flask('app')
+
+style_html = '<link rel="stylesheet" href="/static/style.css">'
 
 @app.route('/')
 def hello_world():
@@ -29,7 +36,15 @@ def hello_world():
 @app.route('/hudiksvallsbostäder/html')
 def hudiksvallsbostäder_html():
   hb = load('hudiksvallsbostäder')
-  resp = app.make_response(hb.df.to_html())
+  hb.df['Adress'] = hb.df.apply(
+    lambda x: make_a_element(x['Adress'], x['Detaljsida']), axis=1
+  )
+  html = style_html
+  html += hb.df.to_html(
+    render_links=True,
+    escape=False,
+  )
+  resp = app.make_response(html)
   resp.mimetype = "text/html"
   return resp
 
@@ -41,7 +56,9 @@ def hudiksvallsbostäder_html():
 @app.route('/hudiksvallsbostäder/txt')
 def hudiksvallsbostäder_text():
   hb = load('hudiksvallsbostäder')
-  resp = app.make_response(hb.df.to_string())
+  resp = app.make_response(
+    hb.df.loc[:, ~hb.df.columns.isin(['Detaljsida'])].to_string() #skippa detaljsida
+  )
   resp.mimetype = "text/plain"
   return resp
 
@@ -50,8 +67,16 @@ def hudiksvallsbostäder_text():
 @app.route('/nordanstigsbostäder.html')
 @app.route('/nordanstigsbostäder/html')
 def nordanstigsbostäder_html():
-  hb = load('nordanstigsbostäder')
-  resp = app.make_response(hb.df.to_html())
+  nb = load('nordanstigsbostäder')
+  nb.df['Adress'] = nb.df.apply(
+    lambda x: make_a_element(x['Adress'], x['Detaljsida']), axis=1
+  )
+  html = style_html
+  html += nb.df.to_html(
+    render_links=True,
+    escape=False,
+  )
+  resp = app.make_response(html)
   resp.mimetype = "text/html"
   return resp
 
@@ -62,8 +87,10 @@ def nordanstigsbostäder_html():
 @app.route('/nordanstigsbostäder.txt')
 @app.route('/nordanstigsbostäder/txt')
 def nordanstigsbostäder_text():
-  hb = load('nordanstigsbostäder')
-  resp = app.make_response(hb.df.to_string())
+  nb = load('nordanstigsbostäder')
+  resp = app.make_response(
+    nb.df.loc[:, ~nb.df.columns.isin(['Detaljsida'])].to_string() #skippa detaljsida
+  )
   resp.mimetype = "text/plain"
   return resp
 
@@ -73,8 +100,16 @@ def nordanstigsbostäder_text():
 @app.route('/gotlandshem.html')
 @app.route('/gotlandshem/html')
 def gotlandshem_html():
-  hb = load('gotlandshem')
-  resp = app.make_response(hb.df.to_html())
+  gh = load('gotlandshem')
+  gh.df['Adress'] = gh.df.apply(
+    lambda x: make_a_element(x['Adress'], x['Detaljsida']), axis=1
+  )
+  html = style_html
+  html += gh.df.to_html(
+    render_links=True,
+    escape=False,
+  )
+  resp = app.make_response(html)
   resp.mimetype = "text/html"
   return resp
 
@@ -85,8 +120,10 @@ def gotlandshem_html():
 @app.route('/gotlandshem.txt')
 @app.route('/gotlandshem/txt')
 def gotlandshem_text():
-  hb = load('gotlandshem')
-  resp = app.make_response(hb.df.to_string())
+  gh = load('gotlandshem')
+  resp = app.make_response(
+    gh.df.loc[:, ~gh.df.columns.isin(['Detaljsida'])].to_string() #skippa detaljsida
+  )
   resp.mimetype = "text/plain"
   return resp
 
@@ -94,8 +131,9 @@ def gotlandshem_text():
 #app.run(host='0.0.0.0', port=8080, debug=True)
 
 if __name__ == '__main__':
+  debug = True
   port = os.environ.get('PORT')
   #port = 8080
   if not port:
     raise Exception('PORT environment variable is not set')
-  app.run(host='0.0.0.0', port=int(port))
+  app.run(host='0.0.0.0', port=int(port), debug=debug)

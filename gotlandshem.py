@@ -16,7 +16,8 @@ def gather_results(rows):
        .strip()) + 'm²',                    # Yta
       (columns[5].xpath('text()')[0]
        .replace(u'\xa0', u' ')).strip(),    # Hyra
-      columns[6].xpath('text()')[0]         # Inflyttning
+      columns[6].xpath('text()')[0],         # Inflyttning
+      columns[1].find('a').get('href'),
       ]
 
     yield dict(zip(headers, values))
@@ -51,7 +52,7 @@ d = json.loads(response.text.lstrip("(").rstrip(");"))['html']['objektlista@lage
 table = etree.HTML(d).cssselect("table")[0]
 rows = iter(table)
 
-headers = [''.join(col.itertext()).strip() for col in next(rows).cssselect('th')]
+headers = [''.join(col.itertext()).strip() for col in next(rows).cssselect('th')] + ['Detaljsida']
 
 results = [res for res in gather_results(rows)]
 
