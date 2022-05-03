@@ -43,7 +43,7 @@ def hudiksvallsbostäder_html():
   html += hb.df.to_html(
     render_links=True,
     escape=False,
-)
+  )
   resp = app.make_response(html)
   resp.mimetype = "text/html"
   return resp
@@ -75,7 +75,7 @@ def nordanstigsbostäder_html():
   html += nb.df.to_html(
     render_links=True,
     escape=False,
-)
+  )
   resp = app.make_response(html)
   resp.mimetype = "text/html"
   return resp
@@ -98,8 +98,16 @@ def nordanstigsbostäder_text():
 @app.route('/gotlandshem.html')
 @app.route('/gotlandshem/html')
 def gotlandshem_html():
-  hb = load('gotlandshem')
-  resp = app.make_response(hb.df.to_html())
+  gh = load('gotlandshem')
+  gh.df['Adress'] = gh.df.apply(
+    lambda x: make_a_element(x['Adress'], x['Detaljsida']), axis=1
+  )
+  html = style_html
+  html += gh.df.to_html(
+    render_links=True,
+    escape=False,
+  )
+  resp = app.make_response(html)
   resp.mimetype = "text/html"
   return resp
 
