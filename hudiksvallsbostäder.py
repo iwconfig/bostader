@@ -11,6 +11,7 @@ def gather_results(rows):
     values = [
       columns[1].find('a').text,
       *[col.find('span').text.replace('\xa0', '.') for col in columns[2:]],
+      url.replace('lagenhet', columns[1].find('a').get("href")),
       ]
     yield dict(zip(headers, values))
 
@@ -39,7 +40,7 @@ tree = lxml.html.fromstring(response.content)
 table = tree.cssselect('table.gridlist')[0]
 
 rows = iter(table)
-headers = [''.join(col.itertext()).strip() for col in next(rows).cssselect('td.header')][1:]
+headers = [''.join(col.itertext()).strip() for col in next(rows).cssselect('td.header')][1:] + ['Detaljsida']
 results = [res for res in gather_results(rows)]
 
 for d in tree.cssselect('.aspNetHidden > input'):
@@ -68,7 +69,6 @@ for N in range(2, num_of_pages+1):
   if N < num_of_pages:
     for d in tree.cssselect('.aspNetHidden > input'):
       data[d.name] = d.value
-
 
 df = pd.DataFrame(results)
 df.index += 1
