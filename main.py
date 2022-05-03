@@ -57,7 +57,7 @@ def hudiksvallsbostäder_html():
 def hudiksvallsbostäder_text():
   hb = load('hudiksvallsbostäder')
   resp = app.make_response(
-    hb.df.loc[:, ~hb.df.columns.isin(['Detaljsida'])] #skippa detaljsida
+    hb.df.loc[:, ~hb.df.columns.isin(['Detaljsida'])].to_string() #skippa detaljsida
   )
   resp.mimetype = "text/plain"
   return resp
@@ -87,8 +87,10 @@ def nordanstigsbostäder_html():
 @app.route('/nordanstigsbostäder.txt')
 @app.route('/nordanstigsbostäder/txt')
 def nordanstigsbostäder_text():
-  hb = load('nordanstigsbostäder')
-  resp = app.make_response(hb.df.to_string())
+  nb = load('nordanstigsbostäder')
+  resp = app.make_response(
+    nb.df.loc[:, ~nb.df.columns.isin(['Detaljsida'])].to_string() #skippa detaljsida
+  )
   resp.mimetype = "text/plain"
   return resp
 
@@ -118,8 +120,10 @@ def gotlandshem_html():
 @app.route('/gotlandshem.txt')
 @app.route('/gotlandshem/txt')
 def gotlandshem_text():
-  hb = load('gotlandshem')
-  resp = app.make_response(hb.df.to_string())
+  gh = load('gotlandshem')
+  resp = app.make_response(
+    gh.df.loc[:, ~gh.df.columns.isin(['Detaljsida'])].to_string() #skippa detaljsida
+  )
   resp.mimetype = "text/plain"
   return resp
 
