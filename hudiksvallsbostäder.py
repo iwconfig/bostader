@@ -8,10 +8,12 @@ def gather_results(rows):
   for row in rows:
     columns = row.findall("td")
     if not columns: continue
+
     values = [
-      columns[1].find('a').text,
-      *[col.find('span').text.replace('\xa0', '.') for col in columns[2:]],
-      url.replace('lagenhet', columns[1].find('a').get("href")),
+      columns[1].find('span').text,
+      columns[2].find('a').text,
+      *[col.find('span').text.replace('\xa0', '.') for col in columns[3:]],
+      url.replace('lagenhet', columns[2].find('a').get("href")),
       ]
     yield dict(zip(headers, values))
 
