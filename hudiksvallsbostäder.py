@@ -12,6 +12,7 @@ def gather_results(rows):
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> a1529d1... removed print call
@@ -19,6 +20,10 @@ def gather_results(rows):
     print(columns)
 >>>>>>> a8ff1ee... hb has added a column for object id
 >>>>>>> 779b0d8... hb has added a column for object id
+=======
+
+>>>>>>> a1529d1... removed print call
+>>>>>>> 9f8093d... removed print call
     values = [
       columns[1].find('span').text,
       columns[2].find('a').text,
