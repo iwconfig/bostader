@@ -8,10 +8,22 @@ def gather_results(rows):
   for row in rows:
     columns = row.findall("td")
     if not columns: continue
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> a1529d1... removed print call
+=======
+    print(columns)
+>>>>>>> a8ff1ee... hb has added a column for object id
+>>>>>>> 779b0d8... hb has added a column for object id
     values = [
-      columns[1].find('a').text,
-      *[col.find('span').text.replace('\xa0', '.') for col in columns[2:]],
-      url.replace('lagenhet', columns[1].find('a').get("href")),
+      columns[1].find('span').text,
+      columns[2].find('a').text,
+      *[col.find('span').text.replace('\xa0', '.') for col in columns[3:]],
+      url.replace('lagenhet', columns[2].find('a').get("href")),
       ]
     yield dict(zip(headers, values))
 
